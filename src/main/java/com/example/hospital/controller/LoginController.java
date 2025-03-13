@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import com.example.hospital.entitities.User;
 import com.example.hospital.serviceImpl.UserRegistrationService;
 
+import jakarta.servlet.http.HttpSession;
+
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
 public class LoginController {
@@ -18,8 +20,9 @@ public class LoginController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    
     @PostMapping("/loginuser")
-    public ResponseEntity<String> loginUser(@RequestBody User user) {
-        return userRegistrationService.authenticateUser(user, authenticationManager);
+    public ResponseEntity<?> loginUser(@RequestBody User user, HttpSession session) {
+        return userRegistrationService.authenticateUserAndStoreSession(user, authenticationManager, session);
     }
 }
