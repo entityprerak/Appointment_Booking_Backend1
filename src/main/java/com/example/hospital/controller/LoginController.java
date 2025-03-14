@@ -6,7 +6,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.hospital.entitities.User;
-import com.example.hospital.serviceImpl.UserRegistrationService;
+import com.example.hospital.service.UserRegistrationService;
 
 import jakarta.servlet.http.HttpSession;
 

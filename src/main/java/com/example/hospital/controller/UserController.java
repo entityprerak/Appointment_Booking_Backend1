@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.hospital.entitities.User;
+import com.example.hospital.service.UserRegistrationService;
 import com.example.hospital.serviceImpl.*;
 
 @RestController

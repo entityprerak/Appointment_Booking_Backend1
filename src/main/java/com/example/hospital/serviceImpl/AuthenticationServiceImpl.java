@@ -1,6 +1,5 @@
 package com.example.hospital.serviceImpl;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,9 +8,10 @@ import org.springframework.stereotype.Service;
 
 import com.example.hospital.entitities.User;
 import com.example.hospital.Repository.UserRegistrationRepository;
+import com.example.hospital.service.AuthenticationService;
 
 @Service
-public class AuthenticationService {
+public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Autowired
     private UserRegistrationRepository userRegistrationRepo;
@@ -19,7 +19,8 @@ public class AuthenticationService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    // User Authentication Logic
+    // ✅ Implementing authenticateUser method from AuthenticationService interface
+    @Override
     public ResponseEntity<String> authenticateUser(User user) {
         if (user.getEmail() == null || user.getPassword() == null) {
             return new ResponseEntity<>("Email and password are required!", HttpStatus.BAD_REQUEST);
@@ -38,7 +39,8 @@ public class AuthenticationService {
         return new ResponseEntity<>("Login successful!", HttpStatus.OK);
     }
 
-    // User Registration Logic
+    // ✅ Implementing registerUser method from AuthenticationService interface
+    @Override
     public ResponseEntity<String> registerUser(User user) {
         if (user.getEmail() == null || user.getEmail().isEmpty()) {
             return new ResponseEntity<>("Email is required!", HttpStatus.BAD_REQUEST);

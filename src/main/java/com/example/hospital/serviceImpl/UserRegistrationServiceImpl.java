@@ -6,12 +6,13 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import com.example.hospital.entitities.User;
 import com.example.hospital.Repository.UserRegistrationRepository;
+import com.example.hospital.service.UserRegistrationService;
 
 import jakarta.servlet.http.HttpSession;
 import java.util.Collections;
@@ -20,14 +21,16 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class UserRegistrationService implements UserDetailsService {
+public class UserRegistrationServiceImpl implements UserRegistrationService {
 
     private final UserRegistrationRepository userRegistrationRepo;
     private final PasswordEncoder passwordEncoder;
+  //  private final AuthenticationManager authenticationManager;  // ✅ Only if authentication is required
 
-    public UserRegistrationService(UserRegistrationRepository userRegistrationRepo, PasswordEncoder passwordEncoder) {
+    public UserRegistrationServiceImpl(UserRegistrationRepository userRegistrationRepo, PasswordEncoder passwordEncoder){//, AuthenticationManager authenticationManager) {
         this.userRegistrationRepo = userRegistrationRepo;
         this.passwordEncoder = passwordEncoder;
+    //    this.authenticationManager = authenticationManager; // ✅ Injected only if needed
     }
 
     // ✅ **Spring Security - Load User by Email for Authentication**
@@ -45,6 +48,7 @@ public class UserRegistrationService implements UserDetailsService {
     }
 
     // ✅ **Authenticate User & Store User ID in Session**
+    @Override
     public ResponseEntity<?> authenticateUserAndStoreSession(User user, AuthenticationManager authenticationManager, HttpSession session) {
         try {
             Authentication authentication = authenticationManager.authenticate(
@@ -52,12 +56,10 @@ public class UserRegistrationService implements UserDetailsService {
             );
 
             if (authentication.isAuthenticated()) {
-                // ✅ Fetch user details from the database
-            	User loggedInUser = userRegistrationRepo.findByEmail(user.getEmail());
+                User loggedInUser = userRegistrationRepo.findByEmail(user.getEmail());
                 if (loggedInUser != null) {
-                    session.setAttribute("userId", loggedInUser.getId()); // Store user ID in session
+                    session.setAttribute("userId", loggedInUser.getId());
 
-                    // ✅ Create response
                     Map<String, Object> responseBody = new HashMap<>();
                     responseBody.put("message", "Login successful!");
                     responseBody.put("userId", loggedInUser.getId());
@@ -71,17 +73,19 @@ public class UserRegistrationService implements UserDetailsService {
         return new ResponseEntity<>("Invalid credentials!", HttpStatus.UNAUTHORIZED);
     }
 
-    // ✅ **Fetch User by Email (For Session Storage)**
+    // ✅ **Fetch User by Email**
+    @Override
     public ResponseEntity<?> getUserByEmail(String email) {
         User user = userRegistrationRepo.findByEmail(email);
         if (user != null) {
-            return ResponseEntity.ok(user); // ✅ Return as ResponseEntity
+            return ResponseEntity.ok(user);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found!");
         }
     }
 
-    // ✅ **User Registration (Encrypt Password Before Storing)**
+    // ✅ **User Registration**
+    @Override
     public ResponseEntity<String> registerUser(User user) {
         if (userRegistrationRepo.findByEmail(user.getEmail()) != null) {
             return new ResponseEntity<>("User already exists!", HttpStatus.CONFLICT);
@@ -91,13 +95,15 @@ public class UserRegistrationService implements UserDetailsService {
         return new ResponseEntity<>("User registered successfully!", HttpStatus.CREATED);
     }
 
-    // ✅ **Fetch All Users (For Admin)**
+    // ✅ **Fetch All Users**
+    @Override
     public ResponseEntity<List<User>> getAllUsers() {
         List<User> users = (List<User>) userRegistrationRepo.findAll();
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
     // ✅ **Fetch User Profile by Email**
+    @Override
     public ResponseEntity<?> getUserByEmailProfile(String email) {
         User user = userRegistrationRepo.findByEmail(email);
         return (user != null)
@@ -106,6 +112,7 @@ public class UserRegistrationService implements UserDetailsService {
     }
 
     // ✅ **Update User Profile**
+    @Override
     public ResponseEntity<String> updateUserProfile(User updatedUser) {
         User existingUser = userRegistrationRepo.findByEmail(updatedUser.getEmail());
         if (existingUser == null) {
@@ -118,7 +125,6 @@ public class UserRegistrationService implements UserDetailsService {
         existingUser.setAge(updatedUser.getAge());
         existingUser.setAddress(updatedUser.getAddress());
 
-        // If user updates password, encrypt the new password before saving
         if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {
             existingUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
         }
@@ -127,7 +133,8 @@ public class UserRegistrationService implements UserDetailsService {
         return new ResponseEntity<>("User updated successfully!", HttpStatus.OK);
     }
 
-    // ✅ **Delete User Profile by Email**
+    // ✅ **Delete User Profile**
+    @Override
     public ResponseEntity<String> deleteUserByEmail(String email) {
         User existingUser = userRegistrationRepo.findByEmail(email);
         if (existingUser == null) {
@@ -138,6 +145,7 @@ public class UserRegistrationService implements UserDetailsService {
     }
 
     // ✅ **Retrieve User ID from Session**
+    @Override
     public ResponseEntity<?> getUserIdFromSession(HttpSession session) {
         Object userId = session.getAttribute("userId");
         if (userId != null) {
