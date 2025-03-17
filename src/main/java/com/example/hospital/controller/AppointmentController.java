@@ -51,7 +51,7 @@ public class AppointmentController {
     public void cancelAppointment(@PathVariable Integer appointmentId) {
         this.appointmentService.cancelAppointment(appointmentId);
         return;
-    }
+    }//
 	
 	@GetMapping("/active")
 	public ResponseEntity<?> getActiveAppointments(@RequestHeader("userId") Long userId) {
