@@ -36,6 +36,13 @@ public class LoginController {
     
     @PostMapping("/loginuser")
     public ResponseEntity<?> loginUser(@RequestBody User user, HttpSession session) {
+        // ✅ Admin Login (Hardcoded)
+        if ("admin@example.com".equals(user.getEmail()) && "admin123".equals(user.getPassword())) {
+            session.setAttribute("admin", true);
+            return ResponseEntity.ok(Map.of("message", "Admin Login Successful!", "role", "ROLE_ADMIN"));
+        }
+
+        // ✅ Normal User Login
         return userRegistrationService.authenticateUserAndStoreSession(user, authenticationManager, session);
     }
     

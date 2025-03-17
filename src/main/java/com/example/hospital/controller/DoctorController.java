@@ -6,7 +6,9 @@ import org.springframework.web.bind.annotation.*;
 
 import com.example.hospital.Repository.DoctorRepository;
 import com.example.hospital.entitities.Doctor;
+import com.example.hospital.entitities.Slot;
 import com.example.hospital.service.DoctorService;
+import com.example.hospital.service.SlotService;
 
 import java.util.List;
 
@@ -19,6 +21,9 @@ public class DoctorController {
     
     @Autowired
     private DoctorService doctorService;
+    
+    @Autowired
+    private SlotService slotService;
 
 
     // Fetch doctors based on optional specialization
@@ -56,5 +61,16 @@ public class DoctorController {
     @DeleteMapping("/delete/{doctorId}")
     public void deleteDoctor(@PathVariable Long doctorId) {
         doctorService.deleteDoctor(doctorId);
+    }
+    // ✅ Allow doctor to add slots
+    @PostMapping("/addSlot/{doctorId}")
+    public Slot addSlot(@PathVariable Long doctorId, @RequestBody Slot slot) {
+        return slotService.addDoctorSlot(doctorId, slot);
+    }
+
+    // ✅ Fetch all slots for a doctor
+    @GetMapping("/slots/{doctorId}")
+    public List<Slot> getDoctorSlots(@PathVariable Long doctorId) {
+        return slotService.getDoctorSlots(doctorId);
     }
 }

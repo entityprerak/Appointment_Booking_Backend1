@@ -2,6 +2,7 @@ package com.example.hospital.serviceImpl;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -62,5 +63,21 @@ public class SlotServiceImpl implements SlotService {
         doctorRepository.save(doctor);
 
         return slot;
+    }
+    
+    @Override
+    public Slot addDoctorSlot(Long doctorId, Slot slot) {
+        // ✅ Ensure Doctor Exists
+        Doctor doctor = doctorRepository.findById(doctorId)
+                .orElseThrow(() -> new RuntimeException("Doctor not found"));
+
+        // ✅ Assign slot to the doctor
+        slot.setDoctor(doctor);
+        return slotRepository.save(slot);
+    }
+
+    @Override
+    public List<Slot> getDoctorSlots(Long doctorId) {
+        return slotRepository.findByDoctorId(doctorId);
     }
 }

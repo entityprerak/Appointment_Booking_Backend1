@@ -42,9 +42,13 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+        .sessionManagement(session -> session
+                .maximumSessions(1) // Limits one session per user
+                .expiredUrl("/login?expired") // Redirect to login on session expiration
+            )
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/loginuser", "/registeruser","/doctors").permitAll()
+                .requestMatchers("/loginuser", "/registeruser","/doctors","/logindoctor").permitAll()
                 .anyRequest().authenticated()
             )
             .formLogin(withDefaults())

@@ -2,6 +2,7 @@ package com.example.hospital.Repository;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -20,4 +21,6 @@ public interface SlotRepository extends JpaRepository<Slot, Integer> {
     @Query("SELECT s FROM Slot s WHERE s.date = :date AND s.doctor.id = :doctorId " +
            "AND (SELECT COUNT(a) FROM Appointment a WHERE a.slot = s) < 4")
     Collection<Slot> findAvailableSlots(Long doctorId, LocalDate date);
+    
+    List<Slot> findByDoctorId(Long doctorId);
 }
